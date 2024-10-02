@@ -18,21 +18,18 @@ public class DB_ARG_CONNECTION {
                 if (conn != null) {
                     System.out.println("Successfully connected to DB");
                 }
-//                String sqlQuery = "use DATABASE book";
                 String sqlQuery = "select * from book";
                 ResultSet rs = stmt.executeQuery(sqlQuery);
                 while(rs.next())
                 {
                   int id = rs.getInt("BookID");
-                  String name = rs.getString("book_name");
+                  String name = rs.getString("BookName");
                   String genre = rs.getString("genre");
                   String author = rs.getString("author");
 
-//                    System.out.println("Book name: "+ name + "  author: "+ author);
                   System.out.println("Book ID : " + id + " Book Name: " + name + " Genre: "+ genre + " Author: "+ author);
                 }
 
-//                System.out.println("Database created successfully!");
 
             } catch (SQLException e) {
                 System.err.println("SQL Error: " + e.getMessage());

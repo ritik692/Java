@@ -1,65 +1,145 @@
 package JDBC;
 
+import javax.swing.plaf.nimbus.State;
+import javax.xml.transform.Result;
 import java.sql.*;
+
+class Jdbc_fields{
+    private Connection conn;
+    private Statement stmt;
+    private ResultSet rs;
+
+    Jdbc_fields(Connection conn, Statement stmt, ResultSet rs)
+    {
+        this.conn = conn;
+        this.stmt = stmt;
+        this.rs = rs;
+    }
+    Connection getConnection()
+    {
+        return this.conn;
+    }
+    Statement getStatement()
+    {
+        return this.stmt;
+    }
+    ResultSet getResultSet ()
+    {
+        return this.rs;
+    }
+    void closeAll() throws SQLException {
+        if(this.rs != null) this.rs.close();
+        this.stmt.close();
+        this.conn.close();
+        System.out.println("All connections have been closed successfully!!");
+    }
+
+
+}
 
 public class JDBC_CONNECTIVITY {
 
     private static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost/book";
+    private static final String DB_URL = "jdbc:mysql://localhost/";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "system";
 
-    public static void main(String[] args) {
+    //    private String jdbcDriver;
+    private String dbUrl;
+//    private String username;
+//    private String password;
 
-        // Load JDBC driver and establish a connection
+
+//    private String dbName;
+//
+//    JDBC_CONNECTIVITY(String jdbcDriver,String dbUrl, String username, String password)
+//    {
+//        this.jdbcDriver = jdbcDriver;
+//        this.dbUrl = dbUrl;
+//        this.username = username;
+//        this.password = password;
+//    }
+
+    private Connection getConnection() {
         try {
-            Class.forName(JDBC_DRIVER);
-            try (Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                 Statement stmt = conn.createStatement()) {
-
-                if (conn != null) {
-                    System.out.println("Successfully connected to DB");
-                }
-
-                // Execute SQL query
-//                String sqlQuery1 = "CREATE DATABASE book";
-//                String sqlQuery2 = "CREATE TABLE BOOK (BookID int," +
-//                        "Book_name varchar(30)," +
-//                        "Genre varchar(30)," +
-//                        "Author varchar(30))";
-//                String sqlQuery3 = "INSERT INTO book values (123,'Atomic Habits','Self Help','James Clear')," +
-//                        "(234,'Rich Dad Poor Dad','Finance', 'Robert Kiyosaki')," +
-//                        "(461,'The catcher in the Rye','Fiction','JD Salinger')";
-
-                String sqlQuery4 = "select * from book";
-                String sqlQuery6 = "CREATE VIEW view1 AS SELECT book_name, author from book where genre = 'Self Help'";
-//                stmt.execute(sqlQuery6);
-                String sqlQuery7 = "SELECT * from view1";
-
-
-//                String sqlQuery5 = "UPDATE book SET Genre = 'Self Help' where BookID = 234";
-//                stmt.executeUpdate(sqlQuery5);
-                ResultSet rs = stmt.executeQuery(sqlQuery7); // executeUpdate for DDL operations
-
-
-
-                while(rs.next())
-                {
-//                    int id = rs.getInt("BookID");
-                    String name = rs.getString("book_name");
-//                    String genre = rs.getString("genre");
-                    String author = rs.getString("author");
-
-                    System.out.println("Book name: "+ name + "  author: "+ author);
-//                    System.out.println("Book ID : " + id + " Book Name: " + name + " Genre: "+ genre + " Author: "+ author);
-                }
-                System.out.println("Database created successfully!");
-
-            } catch (SQLException e) {
-                System.err.println("SQL Error: " + e.getMessage());
-            }
-        } catch (ClassNotFoundException e) {
-            System.err.println("JDBC Driver not found: " + e.getMessage());
+            Connection conn = DriverManager.getConnection(this.dbUrl, USERNAME, PASSWORD);
+            return conn;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
+
+    private void processCreateOrDeleteQuery(String sqlQuery) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            boolean flag = stmt.execute(sqlQuery);
+
+            stmt.close();
+            conn.close();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+//
+
+    JDBC_CONNECTIVITY(String dbName) throws ClassNotFoundException, SQLException {
+        Class.forName(JDBC_DRIVER);
+        this.dbUrl = DB_URL + dbName;
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+
+            if (conn != null) {
+                System.out.println("Successfully connected to DB: " + dbName);
+                conn.close();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+//        this.username = username;
+//        this.password = password;
+    }
+
+
+    public void create(String sqlQuery) {
+        processCreateOrDeleteQuery(sqlQuery);
+
+    }
+
+    public Jdbc_fields read(String sqlQuery) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sqlQuery);
+
+            return new Jdbc_fields(conn, stmt, rs);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void update(String sqlQuery) {
+        try {
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            int rows_affected = stmt.executeUpdate(sqlQuery);
+            System.out.println("Rows affected upon updation : " + rows_affected);
+            stmt.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(String sqlQuery) {
+        processCreateOrDeleteQuery(sqlQuery);
+    }
+
 }
