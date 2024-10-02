@@ -1,6 +1,6 @@
 package Java_Basics;
 
-public class updated_switch {
+public class Updated_switch {
     public static void main(String[] args) {
         String day = "Sunday";
         switch(day) {

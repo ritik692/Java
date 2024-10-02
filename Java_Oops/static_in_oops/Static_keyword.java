@@ -1,6 +1,6 @@
 package Java_Oops.static_in_oops;
 
-public class static_keyword {
+public class Static_keyword {
     public static void main(String[] args) throws ClassNotFoundException {
 
         // class loader to execute the code in  static {} block, without instantiating the class Java_Oops.static_in_oops.Mobile

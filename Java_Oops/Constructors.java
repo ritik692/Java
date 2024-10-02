@@ -28,7 +28,7 @@ class Teacher{
     }
 }
 
-public class constructors {
+public class Constructors {
     public static void main(String[] args) throws ClassNotFoundException {
         Teacher teacher = new Teacher(18,"Ritik");
         teacher.show();
